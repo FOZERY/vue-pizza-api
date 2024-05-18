@@ -1,13 +1,22 @@
 <?php
-
+require_once "config.php";
 class Database
 {
-    private $host = "db";
-    private $port = "5432";
-    private $db_name = "pizza_delivery";
-    private $username = "postgres";
-    private $password = "password";
+    private $host;
+    private $port;
+    private $db_name;
+    private $username;
+    private $password;
     public $conn;
+
+    public function __construct()
+    {
+        $this->host = $_ENV["DB_HOST"];
+        $this->port = $_ENV["DB_PORT"];
+        $this->db_name = $_ENV["DB_NAME"];
+        $this->username = $_ENV["DB_USERNAME"];
+        $this->password = $_ENV["DB_PASSWORD"];
+    }
 
     public function getConnection()
     {

@@ -13,12 +13,12 @@ if($_SERVER["REQUEST_METHOD"]==="OPTIONS") {
     die();
 }
 // Требуется для декодирования JWT
-include_once "../../config/Core.php";
 include_once "../../libs/php-jwt/src/JWT.php";
 include_once "../../libs/php-jwt/src/Key.php";
 include_once "../../middleware/AuthMiddleware.php";
+include_once "../../config/config.php";
+
 use \Firebase\JWT\JWT;
-use \Firebase\JWT\Key;
 
 if($_SERVER['REQUEST_METHOD'] !== 'GET') {
     http_response_code(405);
@@ -37,10 +37,10 @@ $authMiddleware = new AuthMiddleware();
 $decodedData = $authMiddleware->validateToken($jwt);
 if($decodedData) {
     $token = array(
-        "iss" => Core::$iss,
-        "aud" => Core::$aud,
-        "iat" => Core::$iat,
-        "nbf" => Core::$nbf,
+        "iss" => $_ENV["JWT_ISS"],
+        "aud" => $_ENV["JWT_AUD"],
+        "iat" => $_ENV["JWT_IAT"],
+        "nbf" => $_ENV["JWT_NBF"],
         "data" => array(
             "id" => $decodedData->id,
             "name" => $decodedData->name,
@@ -52,7 +52,7 @@ if($decodedData) {
     );
 
 
-    $jwt = JWT::encode($token, Core::$key, 'HS256');
+    $jwt = JWT::encode($token, $_ENV["JWT_KEY"], 'HS256');
     echo json_encode(
         array(
             "jwt" => $jwt

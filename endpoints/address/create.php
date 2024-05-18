@@ -7,7 +7,6 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 include_once "../../config/Database.php";
 include_once "../../objects/Address.php";
-include_once "../../config/path.php";
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     http_response_code(405);

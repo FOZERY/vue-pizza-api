@@ -9,7 +9,6 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 // подключим файл для соединения с базой и объектом Product
 include_once "../../config/Database.php";
 include_once "../../objects/Product.php";
-include_once "../../config/path.php";
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     http_response_code(405);

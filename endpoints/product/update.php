@@ -7,7 +7,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 include_once "../../config/Database.php";
 include_once "../../objects/Product.php";
-include_once "../../config/path.php";
+include_once "../../config/config.php";
 
 // получаем соединение с базой данных
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
@@ -48,7 +48,7 @@ if (!empty($_FILES['image']["name"])) {
         return;
     }
 
-    $destination = ROOT_PATH . "/static/products/" . $imageName;
+    $destination = $_ENV["ROOT_PATH"] . "/static/products/" . $imageName;
     if (!move_uploaded_file($fileTmp, $destination)) {
         http_response_code(500);
         die(json_encode(array("message" => "Ошибка загрузки файла")));

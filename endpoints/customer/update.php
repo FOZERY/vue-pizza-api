@@ -7,7 +7,6 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 include_once "../../config/Database.php";
 include_once "../../objects/Customer.php";
-include_once "../../config/path.php";
 
 // получаем соединение с базой данных
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
