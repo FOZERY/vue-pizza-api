@@ -12,6 +12,7 @@ class Customer
     public $surname;
     public $email;
     public $phone;
+    public $address_id;
     public $address;
 
     // конструктор для соединения с базой данных
@@ -52,12 +53,18 @@ class Customer
 
     public function create($name = null, $surname = null, $email = null, $phone = null, $address = null)
     {
+        $this->name = $name;
+        $this->surname = $surname;
+        $this->email = $email;
+        $this->phone = $phone;
+        $this->address = $address;
+
         $this->conn->beginTransaction();
         try {
-            if (isset($address)) {
+            if (isset($this->address)) {
                 $query = "SELECT id FROM addresses WHERE address = :address";
                 $stmt = $this->conn->prepare($query);
-                $stmt->execute([":address" => $address]);
+                $stmt->execute([":address" => $this->address]);
 
                 $existingAddress = $stmt->fetch(PDO::FETCH_ASSOC);
                 if ($existingAddress) {
@@ -65,7 +72,7 @@ class Customer
                 } else {
                     $query = "INSERT INTO addresses (address) VALUES (:address)";
                     $stmt = $this->conn->prepare($query);
-                    $stmt->execute([":address" => $address]);
+                    $stmt->execute([":address" => $this->address]);
                     $addressId = $this->conn->lastInsertId();
                 }
             }
@@ -75,23 +82,23 @@ class Customer
             VALUES (:name, :surname, :email, :phone)";
 
             $stmtParams = [
-                ":name" => $name,
-                ":surname" => $surname ?? null,
-                ":email" => $email ?? null,
-                ":phone" => $phone,
+                ":name" => $this->name,
+                ":surname" => $this->surname ?? null,
+                ":email" => $this->email ?? null,
+                ":phone" => $this->phone,
             ];
 
             $stmt = $this->conn->prepare($query);
             $stmt->execute($stmtParams);
 
-            $customerId = $this->conn->lastInsertId();
+            $this->id = $this->conn->lastInsertId();
 
             if (isset($addressId)) {
                 $query = "INSERT INTO address_customer(address_id, customer_id) VALUES (:address_id, :customer_id)";
                 $stmt = $this->conn->prepare($query);
                 $stmt->execute([
                     ":address_id" => $addressId,
-                    ":customer_id" => $customerId
+                    ":customer_id" => $this->id
                 ]);
             }
 
@@ -108,32 +115,15 @@ class Customer
     {
         $this->conn->beginTransaction();
         try {
-            $stmtParams = [];
-            $setValues = [];
+            $query = "CALL update_customer(:id, :name, :surname, :email, :phone)";
 
-            $query = "UPDATE 
-            " . $this->table_name . " SET";
-
-            if (isset($name)) {
-                $setValues[] = "name = :name";
-                $stmtParams[":name"] = $name;
-            }
-            if (isset($surname)) {
-                $setValues[] = "surname = :surname";
-                $stmtParams[":surname"] = $surname;
-            }
-            if (isset($email)) {
-                $setValues[] = "email = :email";
-                $stmtParams[":email"] = $email;
-            }
-            if (isset($phone)) {
-                $setValues[] = "phone = :phone";
-                $stmtParams[":phone"] = $phone;
-            }
-            $query .= " " . implode(", ", $setValues);
-            $query .= " WHERE id = :id";
-
-            $stmtParams[":id"] = $id;
+            $stmtParams=[
+                ":id"=>$id,
+                ":name"=>$name ?? null,
+                ":surname"=>$surname ?? null,
+                ":email"=>$email ?? null,
+                ":phone"=>$phone ?? null
+            ];
 
             $stmt = $this->conn->prepare($query);
             $stmt->execute($stmtParams);
@@ -150,8 +140,7 @@ class Customer
     public function delete()
     {
         try {
-            $query = "DELETE FROM 
-            " . $this->table_name . " WHERE id = :id";
+            $query = "CALL delete_customer(:id);";
 
             $stmtParams = [
                 ":id" => $this->id,
@@ -163,5 +152,30 @@ class Customer
             echo (json_encode(array("message" => $error->getMessage())));
             return false;
         }
+    }
+
+    public function phoneExists($phone)
+    {
+        $query = "SELECT c.id AS id, c.name AS name, c.surname AS surname, c.email AS email, c.phone AS phone FROM " . $this->table_name  . " AS c
+        WHERE phone = :phone;";
+
+        $stmt = $this->conn->prepare($query);
+
+        $stmt->execute([
+            ":phone"=>$phone,
+        ]);
+
+        if($stmt->rowCount() > 0) {
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            $this->id = $row["id"];
+            $this->name = $row["name"];
+            $this->surname = $row["surname"];
+            $this->email = $row["email"];
+            $this->phone = $row["phone"];
+
+            return true;
+        }
+        return false;
     }
 }

@@ -47,15 +47,20 @@ class Courier
     {
         $this->conn->beginTransaction();
         try {
+            /*
             $query = "INSERT INTO 
                 " . $this->table_name . "(name,surname,patronymic,phone)
             VALUES (:name, :surname, :patronymic, :phone)";
+
+
+            */
+            $query = "CALL insert_courier(:name, :surname, :patronymic, :phone);";
 
             $stmtParams = [
                 ":name" => $name,
                 ":surname" => $surname,
                 ":patronymic" => $patronymic ?? null,
-                ":phone" => $phone,
+                ":phone" => $phone
             ];
 
             $stmt = $this->conn->prepare($query);
@@ -75,32 +80,15 @@ class Courier
     {
         $this->conn->beginTransaction();
         try {
-            $stmtParams = [];
-            $setValues = [];
+            $query = "CALL update_courier(:id, :name, :surname, :patronymic, :phone);";
 
-            $query = "UPDATE 
-            " . $this->table_name . " SET";
-
-            if (isset($name)) {
-                $setValues[] = "name = :name";
-                $stmtParams[":name"] = $name;
-            }
-            if (isset($surname)) {
-                $setValues[] = "surname = :surname";
-                $stmtParams[":surname"] = $surname;
-            }
-            if (isset($patronymic)) {
-                $setValues[] = "patronymic = :patronymic";
-                $stmtParams[":patronymic"] = $patronymic;
-            }
-            if (isset($phone)) {
-                $setValues[] = "phone = :phone";
-                $stmtParams[":phone"] = $phone;
-            }
-            $query .= " " . implode(", ", $setValues);
-            $query .= " WHERE id = :id";
-
-            $stmtParams[":id"] = $id;
+            $stmtParams = [
+                ":id"=>$id,
+                ":name"=>$name ?? null,
+                ":surname"=>$surname ?? null,
+                ":patronymic"=>$patronymic ?? null,
+                ":phone"=>$phone ?? null
+            ];
 
             $stmt = $this->conn->prepare($query);
             $stmt->execute($stmtParams);
@@ -117,8 +105,11 @@ class Courier
     public function delete($id)
     {
         try {
+            /*
             $query = "DELETE FROM 
             " . $this->table_name . " WHERE id = :id";
+            */
+            $query = "CALL delete_courier(:id);";
 
             $stmtParams = [
                 ":id" => $id,

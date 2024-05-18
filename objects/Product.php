@@ -15,7 +15,7 @@ class Product
     public $type_id;
     public $type_name;
     public $type_name_ru;
-    public $inSlider;
+    public $in_slider;
     public $image;
 
     // конструктор для соединения с базой данных
@@ -26,8 +26,9 @@ class Product
 
     public function read()
     {
-        $query = "SELECT 
-            p.id, p.name, p.description, p.price, p.image, t.id as type_id, t.type_name, t.type_name_ru, p.inSlider 
+       /*
+        $query = "SELECT
+            p.id, p.name, p.description, p.price, p.image, t.id as type_id, t.type_name, t.type_name_ru, p.in_slider 
         FROM
             " . $this->table_name . " AS p
         LEFT JOIN
@@ -41,12 +42,13 @@ class Product
         } elseif (isset($this->type_id)) {
             $query .= " WHERE t.id = :type_id";
         }
-        $query .= " ORDER BY p.price DESC";
-
-        $stmtParams = [];
-
-        if (isset($this->name)) $stmtParams[":name"] = $this->name . "%";
-        if (isset($this->type_id)) $stmtParams[":type_id"] = $this->type_id;
+        $query .= " ORDER BY p.price DESC";S
+       */
+        $query = "SELECT * FROM get_products(:name, :type_id);";
+        $stmtParams = [
+            ":name"=>$this->name ?? null,
+            ":type_id"=>$this->type_id ?? null,
+        ];
 
         $stmt = $this->conn->prepare($query);
         $stmt->execute($stmtParams);
@@ -55,9 +57,13 @@ class Product
 
     public function create()
     {
-        $query = "INSERT INTO 
+        /*
+        $query = "INSERT INTO
             " . $this->table_name . "(name,description,price,product_type_id,image)
         VALUES (:name, :description, :price, :product_type_id, :image)";
+        */
+
+        $query = "CALL create_product(:name, :description, :price, :product_type_id, :image)";
 
         $stmtParams = [
             ":name" => $this->name,
@@ -75,15 +81,16 @@ class Product
 
     public function readOne()
     {
-        $query = "SELECT 
-        p.id, p.name, p.description, p.price, p.image, t.type_name, t.type_name_ru, p.inSlider 
-    FROM
-        " . $this->table_name . " AS p
+    /*
+        $query = "SELECT
+        p.id, p.name, p.description, p.price, p.image, t.type_name, t.type_name_ru, p.in_slider
+    FROM products AS p
     LEFT JOIN
         product_type AS t
     ON p.product_type_id = t.id
-    WHERE p.id = :id
-    ORDER BY p.price DESC";
+    WHERE p.id = :id";
+    */
+        $query = "SELECT * FROM get_product_details(:id)"; // использование функции
 
         $stmt = $this->conn->prepare($query);
 
@@ -97,7 +104,7 @@ class Product
         $this->type_name = $product["type_name"] ?? null;
         $this->type_name_ru = $product["type_name_ru"] ?? null;
         $this->image = $product["image"] ?? null;
-        $this->inSlider = $product["inSlider"] ?? null;
+        $this->in_slider = $product["in_slider"] ?? null;
 
         return [
             "id" => $this->id,
@@ -107,7 +114,7 @@ class Product
             "type_name" => $this->type_name,
             "type_name_ru" => $this->type_name_ru,
             "image" => $this->image,
-            "inSlider" => $this->inSlider
+            "in_slider" => $this->in_slider
         ];
     }
 
@@ -117,33 +124,17 @@ class Product
             $stmtParams = [];
             $setValues = [];
 
-            $query = "UPDATE 
-        " . $this->table_name . " SET";
 
-            if (isset($name)) {
-                $setValues[] = "name = :name";
-                $stmtParams[":name"] = $name;
-            }
-            if (isset($description)) {
-                $setValues[] = "description = :description";
-                $stmtParams[":description"] = $description;
-            }
-            if (isset($price)) {
-                $setValues[] = "price = :price";
-                $stmtParams[":price"] = $price;
-            }
-            if (isset($product_type_id)) {
-                $setValues[] = "product_type_id = :product_type_id";
-                $stmtParams[":product_type_id"] = $product_type_id;
-            }
-            if (isset($image)) {
-                $setValues[] = "image = :image";
-                $stmtParams[":image"] = $image;
-            }
-            $query .= " " . implode(", ", $setValues);
-            $query .= " WHERE id = :id";
+            $query = "CALL update_product(:id, :name, :description, :price, :product_type_id,:image);";
 
-            $stmtParams[":id"] = $id;
+            $stmtParams = [
+                ":id"=>$id,
+                ":name"=>$name ?? null,
+                ":description"=>$description ?? null,
+                ":price"=>$price ?? null,
+                ":product_type_id"=>$product_type_id ?? null,
+                ":image"=>$image ?? null,
+            ];
 
             $stmt = $this->conn->prepare($query);
             $stmt->execute($stmtParams);
@@ -156,8 +147,11 @@ class Product
 
     public function delete()
     {
-        $query = "DELETE FROM 
+        /*
+        $query = "DELETE FROM
         " . $this->table_name . " WHERE id = :id";
+        */
+        $query = "CALL delete_product(:id)";
 
         $stmtParams = [
             ":id" => $this->id,
