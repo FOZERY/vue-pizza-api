@@ -9,7 +9,6 @@ class Customer
     // свойства объекта
     public $id;
     public $name;
-    public $surname;
     public $email;
     public $phone;
     public $address_id;
@@ -26,7 +25,7 @@ class Customer
         try {
             $sortBy = $sortBy ?? "id ASC";
 
-            $query = "SELECT c.id AS id, c.name AS name, c.surname AS surname, c.email AS email, c.phone AS phone, addr.id AS address_id, addr.address AS address 
+            $query = "SELECT c.id AS id, c.name AS name, c.email AS email, c.phone AS phone, addr.id AS address_id, addr.address AS address 
         FROM " . $this->table_name  . " AS c
         LEFT JOIN 
         address_customer AS ac
@@ -37,7 +36,7 @@ class Customer
 
             $stmtParams = [];
             if (isset($searchBy)) {
-                $query .= " WHERE name LIKE :searchBy OR surname LIKE :searchBy OR email LIKE :searchBy OR phone LIKE :searchBy";
+                $query .= " WHERE name LIKE :searchBy OR email LIKE :searchBy OR phone LIKE :searchBy";
                 $stmtParams = [":searchBy" => $searchBy . "%"];
             }
             $query .= " ORDER BY " . $sortBy;
@@ -51,10 +50,9 @@ class Customer
         }
     }
 
-    public function create($name = null, $surname = null, $email = null, $phone = null, $address = null)
+    public function create($name = null, $email = null, $phone = null, $address = null)
     {
         $this->name = $name;
-        $this->surname = $surname;
         $this->email = $email;
         $this->phone = $phone;
         $this->address = $address;
@@ -78,12 +76,11 @@ class Customer
             }
 
             $query = "INSERT INTO 
-                " . $this->table_name . "(name,surname,email,phone)
-            VALUES (:name, :surname, :email, :phone)";
+                " . $this->table_name . "(name,email,phone)
+            VALUES (:name, :email, :phone)";
 
             $stmtParams = [
                 ":name" => $this->name,
-                ":surname" => $this->surname ?? null,
                 ":email" => $this->email ?? null,
                 ":phone" => $this->phone,
             ];
@@ -111,16 +108,15 @@ class Customer
         }
     }
 
-    public function update($id, $name, $surname, $email, $phone)
+    public function update($id, $name, $email, $phone)
     {
         $this->conn->beginTransaction();
         try {
-            $query = "CALL update_customer(:id, :name, :surname, :email, :phone)";
+            $query = "CALL update_customer(:id, :name, :email, :phone)";
 
             $stmtParams=[
                 ":id"=>$id,
                 ":name"=>$name ?? null,
-                ":surname"=>$surname ?? null,
                 ":email"=>$email ?? null,
                 ":phone"=>$phone ?? null
             ];
@@ -156,7 +152,7 @@ class Customer
 
     public function phoneExists($phone)
     {
-        $query = "SELECT c.id AS id, c.name AS name, c.surname AS surname, c.email AS email, c.phone AS phone FROM " . $this->table_name  . " AS c
+        $query = "SELECT c.id AS id, c.name AS name, c.email AS email, c.phone AS phone FROM " . $this->table_name  . " AS c
         WHERE phone = :phone;";
 
         $stmt = $this->conn->prepare($query);
@@ -170,7 +166,6 @@ class Customer
 
             $this->id = $row["id"];
             $this->name = $row["name"];
-            $this->surname = $row["surname"];
             $this->email = $row["email"];
             $this->phone = $row["phone"];
 

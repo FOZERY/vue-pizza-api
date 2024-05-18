@@ -28,14 +28,13 @@ if (empty($_POST["id"])) {
 $data = [
     "id" => trim($_POST["id"]),
     "name" => !empty($_POST["name"]) ? trim($_POST["name"]) : null,
-    "surname" => !empty($_POST["surname"]) ? trim($_POST["surname"]) : null,
     "email" => !empty($_POST["email"]) ? trim($_POST["email"]) : null,
     "phone" =>  !empty($_POST["phone"]) ? trim($_POST["phone"]) : null,
     "address" =>  !empty($_POST["address"]) ? trim($_POST["address"]) : null
 ];
 
 
-if ($customer->update($data["id"], $data["name"], $data["surname"], $data["email"], $data["phone"])) {
+if ($customer->update($data["id"], $data["name"], $data["email"], $data["phone"])) {
     http_response_code(200);
     echo json_encode(array("message" => "Продукт был обновлён."), JSON_UNESCAPED_UNICODE);
 } else {

@@ -44,7 +44,7 @@ class Product
         }
         $query .= " ORDER BY p.price DESC";S
        */
-        $query = "SELECT * FROM get_products(:name, :type_id);";
+        $query = "CALL get_products(:name, :type_id);";
         $stmtParams = [
             ":name"=>$this->name ?? null,
             ":type_id"=>$this->type_id ?? null,
@@ -90,7 +90,7 @@ class Product
     ON p.product_type_id = t.id
     WHERE p.id = :id";
     */
-        $query = "SELECT * FROM get_product_details(:id)"; // использование функции
+        $query = "CALL get_product_details(:id)"; // использование функции
 
         $stmt = $this->conn->prepare($query);
 

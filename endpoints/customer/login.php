@@ -46,7 +46,6 @@ if($otp["code"] !== $_POST["code"] || $otp["phone"] !== $_POST["phone"]) {
 
 $data = [
     "name" => !empty($_POST["name"]) ? trim($_POST["name"]) : null,
-    "surname" => !empty($_POST["surname"]) ? trim($_POST["surname"]) : null,
     "email" => !empty($_POST["email"]) ? trim($_POST["email"]) : null,
     "phone" => trim($_POST["phone"]),
     "address" => !empty($_POST["address"]) ? trim($_POST["address"]) : null
@@ -70,7 +69,6 @@ if ($phone_exists) {
             "data" => array(
                 "id" => $customer->id,
                 "name" => $customer->name,
-                "surname" => $customer->surname,
                 "phone" => $customer->phone,
                 "email" => $customer->email,
                 "role" => "user",
@@ -92,7 +90,7 @@ if ($phone_exists) {
 } else {
     // Registration
     try {
-        if ($customer->create($data["name"], $data["surname"], $data["email"], $data["phone"], $data["address"])) {
+        if ($customer->create($data["name"], $data["email"], $data["phone"], $data["address"])) {
             $token = array(
                 "iss" => $_ENV["JWT_ISS"],
                 "aud" => $_ENV["JWT_AUD"],
@@ -101,7 +99,6 @@ if ($phone_exists) {
                 "data" => array(
                     "id" => $customer->id,
                     "name" => $customer->name,
-                    "surname" => $customer->surname,
                     "phone" => $customer->phone,
                     "email" => $customer->email,
                     "role" => "user",

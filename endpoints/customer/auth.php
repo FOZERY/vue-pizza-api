@@ -44,13 +44,11 @@ if($decodedData) {
         "data" => array(
             "id" => $decodedData->id,
             "name" => $decodedData->name,
-            "surname" => $decodedData->surname,
             "phone" => $decodedData->phone,
             "email" => $decodedData->email,
             "role" => $decodedData->role,
         )
     );
-
 
     $jwt = JWT::encode($token, $_ENV["JWT_KEY"], 'HS256');
     echo json_encode(
