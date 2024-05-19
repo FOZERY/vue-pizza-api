@@ -9,29 +9,34 @@ class ExolveAPI
     private $text;
     private $API_KEY;
 
-    public function __construct($destination, $text)
+    public function __construct()
     {
         $this->api_url = $_ENV["EXOLVE_API_URL"];
         $this->number = $_ENV["EXOLVE_API_NUMBER"];
         $this->API_KEY = $_ENV["EXOLVE_API_KEY"];
-
-        if(str_starts_with(trim($destination), '+')) {
-            $destination = substr($destination, 1);
-        }
-        $this->destination = $destination;
-        $this->text = $text;
     }
 
-    public function sendMessage()
+    private function formatNumber($number)
     {
+        if (str_starts_with(trim($number), '+')) {
+            $number = substr($number, 1);
+        }
+        return $number;
+    }
+
+    public function sendMessage($destination, $text)
+    {
+        $this->destination = $this->formatNumber($destination);
+        $this->text = $text;
+
         $data = array(
-            "number"=>$this->number,
-            "destination"=>$this->destination,
-            "text"=>$this->text
+            "number" => $this->number,
+            "destination" => $this->destination,
+            "text" => $this->text
         );
 
         $options = array(
-            'http'=>array(
+            'http' => array(
                 'header'  => "Content-Type: application/json" . PHP_EOL .
                     "Authorization: Bearer {$this->API_KEY}",
                 'method'  => 'POST',
