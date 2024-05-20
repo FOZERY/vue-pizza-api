@@ -47,13 +47,6 @@ class Courier
     {
         $this->conn->beginTransaction();
         try {
-            /*
-            $query = "INSERT INTO 
-                " . $this->table_name . "(name,surname,patronymic,phone)
-            VALUES (:name, :surname, :patronymic, :phone)";
-
-
-            */
             $query = "CALL insert_courier(:name, :surname, :patronymic, :phone);";
 
             $stmtParams = [
@@ -105,10 +98,7 @@ class Courier
     public function delete($id)
     {
         try {
-            /*
-            $query = "DELETE FROM 
-            " . $this->table_name . " WHERE id = :id";
-            */
+
             $query = "CALL delete_courier(:id);";
 
             $stmtParams = [
