@@ -50,6 +50,23 @@ class Customer
         }
     }
 
+    public function readOne($id)
+    {
+        try {
+            $query = "CALL get_customer_details(:id);";
+            $stmt = $this->conn->prepare($query);
+
+            $stmt->execute([
+                ":id" => $id,
+            ]);
+
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $error) {
+            die(json_encode(array("message" => $error->getMessage())));
+
+        }
+    }
+
     public function create($name = null, $email = null, $phone = null, $address = null)
     {
         $this->name = $name;
