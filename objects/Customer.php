@@ -26,7 +26,7 @@ class Customer
             $sortBy = $sortBy ?? "id ASC";
 
             $query = "SELECT c.id AS id, c.name AS name, c.email AS email, c.phone AS phone, addr.id AS address_id, addr.address AS address 
-        FROM " . $this->table_name  . " AS c
+        FROM " . $this->table_name . " AS c
         LEFT JOIN 
         address_customer AS ac
         ON ac.customer_id = c.id
@@ -131,11 +131,11 @@ class Customer
         try {
             $query = "CALL update_customer(:id, :name, :email, :phone)";
 
-            $stmtParams=[
-                ":id"=>$id,
-                ":name"=>$name ?? null,
-                ":email"=>$email ?? null,
-                ":phone"=>$phone ?? null
+            $stmtParams = [
+                ":id" => $id,
+                ":name" => $name ?? null,
+                ":email" => $email ?? null,
+                ":phone" => $phone ?? null
             ];
 
             $stmt = $this->conn->prepare($query);
@@ -145,7 +145,7 @@ class Customer
             return true;
         } catch (PDOException $error) {
             $this->conn->rollBack();
-            echo (json_encode(array("message" => $error->getMessage())));
+            echo(json_encode(array("message" => $error->getMessage())));
             return false;
         }
     }
@@ -162,23 +162,23 @@ class Customer
             $stmt->execute($stmtParams);
             return true;
         } catch (PDOException $error) {
-            echo (json_encode(array("message" => $error->getMessage())));
+            echo(json_encode(array("message" => $error->getMessage())));
             return false;
         }
     }
 
     public function phoneExists($phone)
     {
-        $query = "SELECT c.id AS id, c.name AS name, c.email AS email, c.phone AS phone FROM " . $this->table_name  . " AS c
+        $query = "SELECT c.id AS id, c.name AS name, c.email AS email, c.phone AS phone FROM " . $this->table_name . " AS c
         WHERE phone = :phone;";
 
         $stmt = $this->conn->prepare($query);
 
         $stmt->execute([
-            ":phone"=>$phone,
+            ":phone" => $phone,
         ]);
 
-        if($stmt->rowCount() > 0) {
+        if ($stmt->rowCount() > 0) {
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
             $this->id = $row["id"];
