@@ -26,24 +26,6 @@ class Product
 
     public function read()
     {
-       /*
-        $query = "SELECT
-            p.id, p.name, p.description, p.price, p.image, t.id as type_id, t.type_name, t.type_name_ru, p.in_slider 
-        FROM
-            " . $this->table_name . " AS p
-        LEFT JOIN
-            product_type AS t
-        ON p.product_type_id = t.id";
-
-        if (isset($this->name) && isset($this->type_id)) {
-            $query .= " WHERE p.name LIKE :name AND p.product_type_id = :type_id";
-        } elseif (isset($this->name)) {
-            $query .= " WHERE p.name LIKE :name";
-        } elseif (isset($this->type_id)) {
-            $query .= " WHERE t.id = :type_id";
-        }
-        $query .= " ORDER BY p.price DESC";S
-       */
         $query = "CALL get_products(:name, :type_id);";
         $stmtParams = [
             ":name"=>$this->name ?? null,
@@ -57,12 +39,6 @@ class Product
 
     public function create()
     {
-        /*
-        $query = "INSERT INTO
-            " . $this->table_name . "(name,description,price,product_type_id,image)
-        VALUES (:name, :description, :price, :product_type_id, :image)";
-        */
-
         $query = "CALL create_product(:name, :description, :price, :product_type_id, :image)";
 
         $stmtParams = [
@@ -81,15 +57,6 @@ class Product
 
     public function readOne()
     {
-    /*
-        $query = "SELECT
-        p.id, p.name, p.description, p.price, p.image, t.type_name, t.type_name_ru, p.in_slider
-    FROM products AS p
-    LEFT JOIN
-        product_type AS t
-    ON p.product_type_id = t.id
-    WHERE p.id = :id";
-    */
         $query = "CALL get_product_details(:id)"; // использование функции
 
         $stmt = $this->conn->prepare($query);
@@ -147,10 +114,7 @@ class Product
 
     public function delete()
     {
-        /*
-        $query = "DELETE FROM
-        " . $this->table_name . " WHERE id = :id";
-        */
+
         $query = "CALL delete_product(:id)";
 
         $stmtParams = [
