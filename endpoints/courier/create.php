@@ -29,7 +29,7 @@ $data = [
     "phone" =>  !empty($_POST["phone"]) ? trim($_POST["phone"]) : null
 ];
 
-if (strlen($data["phone"]) > 11) {
+if (strlen($data["phone"]) > 12) {
     http_response_code(400);
     die(json_encode(array("message" => "Неверная длина номера телефона")));
 }
