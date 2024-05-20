@@ -1,6 +1,8 @@
 <?php
 require_once $_SERVER["DOCUMENT_ROOT"] . "/config/config.php";
 
+require_once $_SERVER["DOCUMENT_ROOT"] . "/libs/php-jwt/src/JWT.php";
+require_once $_SERVER["DOCUMENT_ROOT"] . "/libs/php-jwt/src/Key.php";
 use \Firebase\JWT\JWT;
 use \Firebase\JWT\Key;
 class AuthMiddleware

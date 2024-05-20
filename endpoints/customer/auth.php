@@ -27,8 +27,8 @@ if($_SERVER['REQUEST_METHOD'] !== 'GET') {
 
 $headers = apache_request_headers();
 
-if(!empty($headers["authorization"])) {
-    $jwt = explode(" ", $headers["authorization"])[1];
+if(!empty($headers["Authorization"])) {
+    $jwt = explode(" ", $headers["Authorization"])[1];
 } else {
     $jwt = null;
 }
